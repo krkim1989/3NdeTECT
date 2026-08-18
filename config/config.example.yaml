@@ -1,0 +1,99 @@
+project: triploid_hybrid_demo
+samples: config/samples.example.tsv
+results: results
+
+references:
+  parent_b_ref: /absolute/path/to/parent_b.fasta
+  parent_a_ref: /absolute/path/to/parent_a.fasta
+
+analysis:
+  primary_reference: parent_b_ref
+  reciprocal_reference: parent_a_ref  # null disables reciprocal-mapping sensitivity analysis
+  parent_a_group: ParentA
+  parent_b_group: ParentB
+  target_group: Target3N
+  outgroup_group: Outgroup1
+  outgroup_groups: [Outgroup1, Outgroup2]
+  # Empty = all contigs. A simple list applies to both references; use the
+  # panel mapping below when reciprocal-reference contig names differ.
+  chromosomes:
+    primary: []
+    reciprocal: []
+  ploidy:
+    reference_panel: primary
+    min_spectrum_density: 1000
+    diploid_ratio_quantile: 0.95
+  diagnostic:
+    min_called_alleles: 16
+    max_missing_fraction: 0.20
+    min_parent_dp: 6
+    min_parent_gq: 20
+    min_variant_qual: 30
+    strict_max_minor_af: 0.02
+    moderate_max_minor_af: 0.10
+  dosage:
+    min_dp: 10
+    min_gq: 20
+  windows:
+    size: 5000000
+    min_sites: 10
+  local_ancestry:
+    states: [0, 1, 2, 3]
+    expected_fractions: [0.0, 0.333333, 0.666667, 1.0]
+    transition_per_mb: 0.015
+    overdispersion_rho: 0.02
+    min_sites_per_segment: 3
+    min_segment_bp: 1000000
+    compare_unconstrained: true
+  dstat:
+    block_size: 5000000
+    min_called_alleles: 4
+    min_sample_dp: 6
+    min_sample_gq: 20
+    min_variant_qual: 30
+    per_individual: true
+    estimator: manuscript_single_orientation
+    calibration_max_copy: 3.0  # full triploid range; do not truncate a 2-copy simple cross
+    calibration_step: 0.1
+  hybrid_validation:
+    tier: strict
+    min_state_dp: 20
+    dosage_state_tolerance: 0.10
+    max_forbidden_fraction: 0.01
+    maternal_parent_group: ParentB  # pedigree/mtDNA prior; null lets COX1 stand alone
+    min_parent_a_copy: 0.10
+    min_methods: 3
+    min_significant_outgroups: 2
+    alpha: 0.05
+    expected_parent_a_copies: 2.0  # pure 4N parent_a sire x 2N parent_b dam
+    simple_cross_tolerance: 0.35
+  mitochondrial:
+    cox1:
+      enabled: true
+      references:
+        ParentA: /absolute/path/to/parent_a_COX1.fa
+        ParentB: /absolute/path/to/parent_b_COX1.fa
+        Outgroup1: /absolute/path/to/outgroup1_COX1.fa
+      sample_roles: [target]
+      min_depth: 3
+      min_base_quality: 20
+      min_major_fraction: 0.60
+      min_breadth: 0.80
+      min_identity: 0.95
+      min_score_margin: 0.001
+      max_reference_length_ratio: 1.10  # references should cover the same COX1 interval
+  kmer:
+    enabled: false
+    k: 21
+    min_count: 2
+    min_diagnostic_kmers: 1000
+    memory_gb: 2
+
+resources:
+  bwa_threads: 12
+  sort_threads: 4
+  gatk_threads: 4
+  mem_mb: 32000
+
+report:
+  title: "Triploidy and hybrid ancestry report"
