@@ -1,0 +1,9 @@
+quantity	value
+reference_length	200000
+diagnostic_sites	644
+target_parent_a_fraction	0.333333
+target_parent_a_copy_number	1
+dstat_parent_a_copy_number	0.61
+target_cox1_lineage	parent_b
+primary_contig	pri_chr1
+reciprocal_contig	rec_chr1

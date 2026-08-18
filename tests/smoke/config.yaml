@@ -1,0 +1,82 @@
+project: synthetic_smoke
+samples: tests/smoke/samples.tsv
+results: tests/smoke/results
+references:
+  primary: tests/smoke/data/primary.fa
+  reciprocal: tests/smoke/data/reciprocal.fa
+analysis:
+  primary_reference: primary
+  reciprocal_reference: reciprocal
+  parent_a_group: parent_a
+  parent_b_group: parent_b
+  target_group: T3N
+  outgroup_group: outgroup
+  chromosomes:
+    primary: [pri_chr1]
+    reciprocal: [rec_chr1]
+  ploidy:
+    reference_panel: primary
+    min_spectrum_density: 10
+    diploid_ratio_quantile: 0.95
+  diagnostic:
+    min_called_alleles: 2
+    max_missing_fraction: 0.75
+    min_parent_dp: 2
+    min_parent_gq: 5
+    min_variant_qual: 10
+    strict_max_minor_af: 0.02
+    moderate_max_minor_af: 0.10
+  dosage: {min_dp: 4, min_gq: 5}
+  windows: {size: 50000, min_sites: 3}
+  local_ancestry:
+    states: [0, 1, 2]
+    expected_fractions: [0.0, 0.333333, 0.666667]
+    transition_per_mb: 0.015
+    overdispersion_rho: 0.02
+    min_sites_per_segment: 2
+    min_segment_bp: 1000
+    compare_unconstrained: true
+  dstat:
+    block_size: 50000
+    min_called_alleles: 2
+    min_sample_dp: 2
+    min_sample_gq: 5
+    min_variant_qual: 10
+    per_individual: true
+    estimator: manuscript_single_orientation
+    calibration_max_copy: 3.0
+    calibration_step: 0.1
+  hybrid_validation:
+    tier: strict
+    min_state_dp: 10
+    dosage_state_tolerance: 0.10
+    max_forbidden_fraction: 0.01
+    maternal_parent_group: parent_b
+    min_parent_a_copy: 0.10
+    min_methods: 3
+    min_significant_outgroups: 1
+    alpha: 0.05
+    expected_parent_a_copies: 2.0
+    simple_cross_tolerance: 0.35
+  mitochondrial:
+    cox1:
+      enabled: true
+      references:
+        parent_a: tests/smoke/data/parent_a_cox1.fa
+        parent_b: tests/smoke/data/parent_b_cox1.fa
+      sample_roles: [target]
+      min_depth: 3
+      min_base_quality: 20
+      min_major_fraction: 0.60
+      min_breadth: 0.80
+      min_identity: 0.95
+      min_score_margin: 0.001
+      max_reference_length_ratio: 1.10
+  kmer:
+    enabled: true
+    k: 21
+    min_count: 2
+    min_diagnostic_kmers: 20
+    memory_gb: 1
+resources: {bwa_threads: 2, sort_threads: 1, gatk_threads: 1, mem_mb: 4000}
+report: {title: "3NdeTECT synthetic smoke test"}

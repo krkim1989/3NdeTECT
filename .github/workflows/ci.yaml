@@ -1,0 +1,33 @@
+name: ci
+on:
+  push:
+  pull_request:
+jobs:
+  python-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install numpy==1.26.4 pandas==2.2.3 scipy==1.15.3 pysam==0.23.0 pyyaml==6.0.2 pytest==8.3.5 snakemake==8.30.0
+      - run: python -m py_compile workflow/scripts/*.py workflow/lib.py
+      - run: pytest -q
+      - run: snakemake --configfile tests/data/dryrun.yaml --lint
+      - run: snakemake --configfile tests/data/dryrun.yaml --cores 1 --dry-run
+  clean-environment-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-file: envs/core.yaml
+          environment-name: 3ndetect-core
+          cache-environment: true
+          init-shell: bash
+      - name: Create isolated nQuire environment
+        shell: bash -el {0}
+        run: micromamba create -y -n 3ndetect-ploidy -f envs/ploidy.yaml
+      - name: Run the full lightweight workflow
+        shell: bash -el {0}
+        run: PATH="${MAMBA_ROOT_PREFIX}/envs/3ndetect-ploidy/bin:${PATH}" make smoke-installed

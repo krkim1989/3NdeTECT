@@ -1,0 +1,165 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+type: object
+required: [samples, results, references, analysis]
+properties:
+  project: {type: string, minLength: 1}
+  samples: {type: string, minLength: 1}
+  results: {type: string, minLength: 1}
+  references:
+    type: object
+    minProperties: 2
+    additionalProperties: {type: string, minLength: 1}
+  analysis:
+    type: object
+    required:
+      - primary_reference
+      - parent_a_group
+      - parent_b_group
+      - target_group
+      - outgroup_group
+      - diagnostic
+      - dosage
+      - windows
+      - local_ancestry
+      - dstat
+      - kmer
+    properties:
+      primary_reference: {type: string, minLength: 1}
+      reciprocal_reference: {type: [string, "null"]}
+      parent_a_group: {type: string, minLength: 1}
+      parent_b_group: {type: string, minLength: 1}
+      target_group: {type: string, minLength: 1}
+      outgroup_group: {type: string, minLength: 1}
+      outgroup_groups:
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items: {type: string, minLength: 1}
+      chromosomes:
+        oneOf:
+          - type: array
+            uniqueItems: true
+            items: {type: [string, integer]}
+          - type: object
+            additionalProperties:
+              type: array
+              uniqueItems: true
+              items: {type: [string, integer]}
+      ploidy:
+        type: object
+        properties:
+          reference_panel: {type: string, enum: [primary, reciprocal]}
+          min_spectrum_density: {type: integer, minimum: 1}
+          diploid_ratio_quantile: {type: number, exclusiveMinimum: 0, exclusiveMaximum: 1}
+      diagnostic:
+        type: object
+        required: [min_called_alleles, max_missing_fraction, strict_max_minor_af, moderate_max_minor_af]
+        properties:
+          min_called_alleles: {type: integer, minimum: 2}
+          max_missing_fraction: {type: number, minimum: 0, maximum: 1}
+          min_parent_dp: {type: integer, minimum: 0}
+          min_parent_gq: {type: integer, minimum: 0}
+          min_variant_qual: {type: number, minimum: 0}
+          strict_max_minor_af: {type: number, minimum: 0, maximum: 0.5}
+          moderate_max_minor_af: {type: number, minimum: 0, maximum: 0.5}
+      dosage:
+        type: object
+        required: [min_dp, min_gq]
+        properties:
+          min_dp: {type: integer, minimum: 1}
+          min_gq: {type: integer, minimum: 0}
+      windows:
+        type: object
+        required: [size, min_sites]
+        properties:
+          size: {type: integer, minimum: 1}
+          min_sites: {type: integer, minimum: 1}
+      local_ancestry:
+        type: object
+        required: [transition_per_mb, min_sites_per_segment]
+        properties:
+          states:
+            type: array
+            minItems: 1
+            uniqueItems: true
+            items: {type: integer, minimum: 0, maximum: 3}
+          expected_fractions:
+            type: array
+            minItems: 1
+            items: {type: number, minimum: 0, maximum: 1}
+          transition_per_mb: {type: number, exclusiveMinimum: 0}
+          overdispersion_rho: {type: number, minimum: 0, exclusiveMaximum: 1}
+          min_sites_per_segment: {type: integer, minimum: 1}
+          min_segment_bp: {type: integer, minimum: 1}
+          compare_unconstrained: {type: boolean}
+      dstat:
+        type: object
+        required: [block_size]
+        properties:
+          block_size: {type: integer, minimum: 1}
+          min_called_alleles: {type: integer, minimum: 2}
+          min_sample_dp: {type: integer, minimum: 0}
+          min_sample_gq: {type: number, minimum: 0}
+          min_variant_qual: {type: number, minimum: 0}
+          per_individual: {type: boolean}
+          estimator: {type: string, enum: [manuscript_single_orientation, frequency_symmetric]}
+          calibration_max_copy: {type: number, exclusiveMinimum: 0, maximum: 3}
+          calibration_step: {type: number, exclusiveMinimum: 0}
+      hybrid_validation:
+        type: object
+        properties:
+          tier: {type: string, enum: [strict, moderate]}
+          min_state_dp: {type: integer, minimum: 1}
+          dosage_state_tolerance: {type: number, minimum: 0, maximum: 0.5}
+          max_forbidden_fraction: {type: number, minimum: 0, maximum: 1}
+          maternal_parent_group: {type: [string, "null"]}
+          min_parent_a_copy: {type: number, minimum: 0}
+          min_methods: {type: integer, minimum: 1, maximum: 4}
+          min_significant_outgroups: {type: integer, minimum: 1}
+          alpha: {type: number, exclusiveMinimum: 0, maximum: 1}
+          expected_parent_a_copies: {type: number, minimum: 0, maximum: 3}
+          simple_cross_tolerance: {type: number, minimum: 0}
+      mitochondrial:
+        type: object
+        properties:
+          cox1:
+            type: object
+            required: [enabled]
+            properties:
+              enabled: {type: boolean}
+              references:
+                type: object
+                minProperties: 2
+                additionalProperties: {type: string, minLength: 1}
+              sample_roles:
+                type: array
+                minItems: 1
+                uniqueItems: true
+                items: {type: string, enum: [target, parent_a, parent_b, outgroup, control]}
+              min_depth: {type: integer, minimum: 1}
+              min_base_quality: {type: integer, minimum: 0}
+              min_major_fraction: {type: number, minimum: 0.5, maximum: 1}
+              min_breadth: {type: number, minimum: 0, maximum: 1}
+              min_identity: {type: number, minimum: 0, maximum: 1}
+              min_score_margin: {type: number, minimum: 0, maximum: 1}
+              max_reference_length_ratio: {type: number, minimum: 1}
+      kmer:
+        type: object
+        required: [enabled, k, min_count]
+        properties:
+          enabled: {type: boolean}
+          k: {type: integer, minimum: 3}
+          min_count: {type: integer, minimum: 1}
+          min_diagnostic_kmers: {type: integer, minimum: 1}
+          memory_gb: {type: integer, minimum: 1}
+  resources:
+    type: object
+    properties:
+      bwa_threads: {type: integer, minimum: 1}
+      sort_threads: {type: integer, minimum: 1}
+      gatk_threads: {type: integer, minimum: 1}
+      mem_mb: {type: integer, minimum: 256}
+  report:
+    type: object
+    properties:
+      title: {type: string, minLength: 1}

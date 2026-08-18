@@ -1,0 +1,8 @@
+sample	group	role	ploidy	read1	read2
+T3N01	Target3N	target	3	/data/T3N01_R1.fastq.gz	/data/T3N01_R2.fastq.gz
+PA01	ParentA	parent_a	2	/data/PA01_R1.fastq.gz	/data/PA01_R2.fastq.gz
+PA02	ParentA	parent_a	2	/data/PA02_R1.fastq.gz	/data/PA02_R2.fastq.gz
+PB01	ParentB	parent_b	2	/data/PB01_R1.fastq.gz	/data/PB01_R2.fastq.gz
+PB02	ParentB	parent_b	2	/data/PB02_R1.fastq.gz	/data/PB02_R2.fastq.gz
+O101	Outgroup1	outgroup	2	/data/O101_R1.fastq.gz	/data/O101_R2.fastq.gz
+O201	Outgroup2	outgroup	2	/data/O201_R1.fastq.gz	/data/O201_R2.fastq.gz
