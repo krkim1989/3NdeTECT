@@ -1,0 +1,7 @@
+sample	group	role	ploidy	read1	read2	reference
+T1	T3N	target	3	tests/data/reads_1.fq	tests/data/reads_2.fq	parent_b
+A1	A	parent_a	2	tests/data/reads_1.fq	tests/data/reads_2.fq	parent_a
+A2	A	parent_a	2	tests/data/reads_1.fq	tests/data/reads_2.fq	parent_a
+B1	B	parent_b	2	tests/data/reads_1.fq	tests/data/reads_2.fq	parent_b
+B2	B	parent_b	2	tests/data/reads_1.fq	tests/data/reads_2.fq	parent_b
+O1	O	outgroup	2	tests/data/reads_1.fq	tests/data/reads_2.fq	parent_b

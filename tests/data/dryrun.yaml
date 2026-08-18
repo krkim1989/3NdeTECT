@@ -1,0 +1,21 @@
+project: dryrun
+samples: tests/data/dryrun_samples.tsv
+results: tests/dryrun-results
+references:
+  parent_b: tests/data/parent_b.fa
+  parent_a: tests/data/parent_a.fa
+analysis:
+  primary_reference: parent_b
+  reciprocal_reference: parent_a
+  parent_a_group: A
+  parent_b_group: B
+  target_group: T3N
+  outgroup_group: O
+  diagnostic: {min_called_alleles: 2, max_missing_fraction: 0.5, strict_max_minor_af: 0.02, moderate_max_minor_af: 0.10}
+  dosage: {min_dp: 10, min_gq: 20}
+  windows: {size: 5000000, min_sites: 10}
+  local_ancestry: {transition_per_mb: 0.015, min_sites_per_segment: 3}
+  dstat: {block_size: 5000000}
+  kmer: {enabled: false, k: 21, min_count: 2}
+resources: {bwa_threads: 2, gatk_threads: 1, mem_mb: 2000}
+report: {title: "Dry-run report"}
