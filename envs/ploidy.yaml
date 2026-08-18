@@ -1,0 +1,10 @@
+name: 3ndetect-ploidy
+channels:
+  - hcc
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  # nQuire is unavailable from Bioconda. Keep its older HTSlib dependency
+  # isolated from the current samtools/bcftools stack in envs/core.yaml.
+  - nquire=0.0.2018.04.05

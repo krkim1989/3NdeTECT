@@ -1,0 +1,7 @@
+sample	group	role	ploidy	read1	read2	reference
+T3N01	T3N	target	3	tests/smoke/data/T3N01.R1.fastq.gz	tests/smoke/data/T3N01.R2.fastq.gz	primary
+PA01	parent_a	parent_a	2	tests/smoke/data/PA01.R1.fastq.gz	tests/smoke/data/PA01.R2.fastq.gz	primary
+PA02	parent_a	parent_a	2	tests/smoke/data/PA02.R1.fastq.gz	tests/smoke/data/PA02.R2.fastq.gz	primary
+PB01	parent_b	parent_b	2	tests/smoke/data/PB01.R1.fastq.gz	tests/smoke/data/PB01.R2.fastq.gz	primary
+PB02	parent_b	parent_b	2	tests/smoke/data/PB02.R1.fastq.gz	tests/smoke/data/PB02.R2.fastq.gz	primary
+O01	outgroup	outgroup	2	tests/smoke/data/O01.R1.fastq.gz	tests/smoke/data/O01.R2.fastq.gz	primary

@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use 3NdeTECT, cite this software and the underlying tools."
+title: "3NdeTECT: triploidy validation and hybrid-ancestry workflow"
+type: software
+authors:
+  - family-names: Kim
+    given-names: Kang-Rae
+version: 0.2.0
+date-released: 2026-08-18
+license: MIT
