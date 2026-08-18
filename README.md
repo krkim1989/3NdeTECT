@@ -1,10 +1,10 @@
 # 3NdeTECT
 
-3NdeTECT is a taxon-agnostic Snakemake workflow for validating triploidy from
+3NdeTECT is an animal-focused Snakemake workflow for validating triploidy from
 whole-genome sequencing and estimating interspecific ancestry in triploid
-organisms. It was developed from *Crassostrea gigas*–*C. angulata* oyster
-analyses, but species names, parental groups, target groups, outgroups, and
-mitochondrial lineages are supplied by the user rather than hard-coded.
+animals. It was developed from *Crassostrea gigas*–*C. angulata* oyster
+analyses, but animal species names, parental groups, target groups, outgroups,
+and mitochondrial lineages are supplied by the user rather than hard-coded.
 
 The workflow answers two separate questions:
 
@@ -16,6 +16,25 @@ Ancestry evidence does not by itself prove a specific pedigree generation.
 3NdeTECT reports the genomic pattern and whether it is compatible with the
 configured simple-cross expectation; broodstock genotypes or an independently
 validated demographic model are needed to label an exact backcross generation.
+
+## Biological scope
+
+3NdeTECT is intended for animals (Kingdom Animalia). It is not presented as a
+general polyploid workflow for plants, fungi, or protists. Its default models
+assume:
+
+- a nuclear genome with biparental inheritance;
+- diploid representatives of both parental animal lineages;
+- triploid target animals with allele dosage states from zero to three copies;
+- sufficiently homologous parental genomes for joint variant analysis; and
+- an independently chosen animal outgroup for D-statistic orientation.
+
+The optional COX1 module is designed for animal mitochondrial lineage
+assignment. Disable it when COX1 does not resolve the relevant animal lineages,
+when homologous candidate references are unavailable, or when the study system
+has an atypical mitochondrial inheritance pattern. Clonal, hybridogenetic, or
+other non-Mendelian animal systems may also require modified pedigree and HMM
+assumptions even when the computational workflow runs successfully.
 
 ## Analysis modules
 
