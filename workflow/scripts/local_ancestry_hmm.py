@@ -33,7 +33,7 @@ def collapse(g,min_sites,min_bp,model):
             last=i-1; left=positions[0] if start==0 else (positions[start-1]+positions[start])//2+1
             right=positions[-1] if last==len(g)-1 else (positions[last]+positions[last+1])//2
             z=g.iloc[start:i]; bp=max(1,right-left+1)
-            rows.append({"sample":z["sample"].iloc[0],"model":model,"CHROM":z["CHROM"].iloc[0],"start":left,"end":right,"bp_length":bp,"A_COPY":int(z.A_COPY.iloc[0]),"n_sites":len(z),"mean_A_read_fraction":z.A_READ_FRACTION.mean(),"pass_filter":len(z)>=min_sites and bp>=min_bp})
+            rows.append({"sample":z["sample"].iloc[0],"model":model,"CHROM":z["CHROM"].iloc[0],"start":left,"end":right,"bp_length":bp,"ploidy":int(z["ploidy"].iloc[0]),"A_COPY":int(z.A_COPY.iloc[0]),"n_sites":len(z),"mean_A_read_fraction":z.A_READ_FRACTION.mean(),"pass_filter":len(z)>=min_sites and bp>=min_bp})
             start=i
     return rows
 

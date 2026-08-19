@@ -239,7 +239,33 @@ snakemake --configfile config/config.yaml --use-conda \
 | `hybrid_validation/hybrid_validation.tsv` | integrated evidence and conflict flags |
 | `cox1/cox1_summary.tsv` | maternal-lineage assignment, breadth, identity, margin |
 | `kmer/kmer_ancestry.tsv` | optional mapping-independent copy estimate |
-| `report/index.html` | human-readable summary report |
+| `figures/*.png` / `figures/*.tiff` | publication figures (PNG for the report, LZW TIFF for print) |
+| `figures/source_data/*.tsv` | the exact numbers behind each figure |
+| `figures/tables/*.tsv` | curated result tables (one per topic) with a `manifest.tsv` |
+| `report/index.html` | human-readable summary report, with the PNG figures embedded |
+
+### Figures and tables
+
+`report.figures` (config) renders the analysis outputs into figures and curated
+tables. Everything is driven by the run's own data and config — chromosome
+count, ploidy states, sample names, and the ancestry legend label
+(`ancestry_label`, defaulting to `parent_a_group`) — so the same rules serve any
+cross, not a fixed study. Generated figures:
+
+| figure | source table |
+|---|---|
+| `chromosome_painting` | `ancestry/local_ancestry_segments.tsv` (per-chromosome parent_a copy-number tracts) |
+| `chromosome_painting_parentB` | same segments painted as parent_b copies (`ploidy - parent_a`); enable with `painting_ancestries: [parent_a, parent_b]` |
+| `window_ancestry` | `ancestry/window_ancestry.tsv` (calibrated copies in genome order) |
+| `integer_dosage` | `hybrid_validation/dosage_states.tsv` (per-target state composition) |
+| `dstat_calibration` | `dstat/synthetic_calibration.tsv` + `dstat/dstat.tsv` |
+| `nquire_ploidy` | `ploidy/ploidy_summary.tsv` (allele-spectrum ratio vs threshold) |
+| `kmer_ancestry` | `kmer/kmer_ancestry.tsv` (only when k-mer analysis is enabled) |
+
+Configure output formats and resolution with `report.figures.formats`
+(e.g. `[png, tiff]`) and `report.figures.dpi`; set `report.figures.enabled:
+false` to skip the whole module, or `report.figures.tables: false` for figures
+only.
 
 Key interpretation rules:
 
