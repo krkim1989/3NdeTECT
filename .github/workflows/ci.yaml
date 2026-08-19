@@ -10,7 +10,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install numpy==1.26.4 pandas==2.2.3 scipy==1.15.3 pysam==0.23.0 pyyaml==6.0.2 pytest==8.3.5 snakemake==8.30.0
+      - run: pip install numpy==1.26.4 pandas==2.2.3 scipy==1.15.3 pysam==0.23.0 pyyaml==6.0.2 pytest==8.3.5 matplotlib==3.10.6 pillow==11.3.0 snakemake==8.30.0
       - run: python -m py_compile workflow/scripts/*.py workflow/lib.py
       - run: pytest -q
       - run: snakemake --configfile tests/data/dryrun.yaml --lint
