@@ -39,6 +39,7 @@ def main():
     w = pd.read_csv(a.windows, sep="\t")
     if w.empty:
         raise SystemExit(f"no windows in {a.windows}")
+    w["CHROM"] = w["CHROM"].astype(str)  # match string .fai keys for numeric names
     fai_lengths = read_fai_lengths(a.fai)
     fai_order = {name: i for i, name in enumerate(fai_lengths)}
     chroms = sorted(w.CHROM.unique(), key=lambda c: (fai_order.get(c, len(fai_order)), natural_key(c)))

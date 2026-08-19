@@ -62,6 +62,9 @@ def main():
     a = p.parse_args()
 
     seg = pd.read_csv(a.segments, sep="\t")
+    # Normalise CHROM to string so purely-numeric chromosome names (1..10) match
+    # the .fai keys, which are always read as strings.
+    seg["CHROM"] = seg["CHROM"].astype(str)
     if "model" in seg.columns:
         seg = seg[seg.model == a.model].copy()
     if seg.empty:
