@@ -163,3 +163,25 @@ properties:
     type: object
     properties:
       title: {type: string, minLength: 1}
+      figures:
+        type: object
+        properties:
+          enabled: {type: boolean}
+          formats:
+            type: array
+            minItems: 1
+            uniqueItems: true
+            items: {type: string, enum: [png, tiff, tif, pdf, svg]}
+          dpi:
+            type: object
+            properties:
+              png: {type: integer, minimum: 50}
+              tiff: {type: integer, minimum: 50}
+          tables: {type: boolean}
+          ancestry_label: {type: [string, "null"]}
+          reciprocal_ancestry_label: {type: [string, "null"]}
+          painting_ancestries:
+            type: array
+            minItems: 1
+            uniqueItems: true
+            items: {type: string, enum: [parent_a, parent_b]}
