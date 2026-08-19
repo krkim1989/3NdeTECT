@@ -62,6 +62,53 @@ ALL_REFERENCE_INPUTS = []
 for ref in config["references"].values():
     ALL_REFERENCE_INPUTS.extend(reference_assets(ref))
 
+# Shared figure helpers live in the common module so Snakemake's lint rule does
+# not see a mixture of helper functions and rules in figures.smk.
+FIG_CFG = config.get("report", {}).get("figures", {})
+FIGURES_ENABLED = FIG_CFG.get("enabled", True)
+FIG_FORMATS = FIG_CFG.get("formats", ["png", "tiff"])
+FIG_DPI = FIG_CFG.get("dpi", {}) or {}
+FIG_DPI_PNG = FIG_DPI.get("png", 150)
+FIG_DPI_TIFF = FIG_DPI.get("tiff", 300)
+ANCESTRY_LABEL = FIG_CFG.get("ancestry_label", config["analysis"]["parent_a_group"])
+ANCESTRY_LABEL_B = FIG_CFG.get("reciprocal_ancestry_label", config["analysis"]["parent_b_group"])
+PAINT_ANCESTRIES = FIG_CFG.get("painting_ancestries", ["parent_a"])
+TABLES_ENABLED = FIG_CFG.get("tables", True)
+KMER_ENABLED = config["analysis"]["kmer"].get("enabled", False)
+FIGDIR = f"{RESULTS}/figures"
+PRIMARY_FAI = f"{PRIMARY_REF}.fai"
+
+
+def fig_outputs(stem):
+    return [f"{FIGDIR}/{stem}.{fmt}" for fmt in FIG_FORMATS]
+
+
+def fig_formats_arg():
+    return ",".join(FIG_FORMATS)
+
+
+def fig_base(wildcards, output):
+    return str(Path(output.figures[0]).with_suffix(""))
+
+
+def figure_targets(_):
+    if not FIGURES_ENABLED:
+        return []
+    targets = []
+    if "parent_a" in PAINT_ANCESTRIES:
+        targets += fig_outputs("chromosome_painting")
+    if "parent_b" in PAINT_ANCESTRIES:
+        targets += fig_outputs("chromosome_painting_parentB")
+    targets += fig_outputs("window_ancestry")
+    targets += fig_outputs("dstat_calibration")
+    targets += fig_outputs("integer_dosage")
+    targets += fig_outputs("nquire_ploidy")
+    if KMER_ENABLED:
+        targets += fig_outputs("kmer_ancestry")
+    if TABLES_ENABLED:
+        targets.append(f"{FIGDIR}/tables/manifest.tsv")
+    return targets
+
 rule validate_inputs:
     input:
         samples=SAMPLE_SHEET,
