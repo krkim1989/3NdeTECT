@@ -5,6 +5,29 @@ from pathlib import Path
 REQUIRED_SAMPLE_COLUMNS = {"sample", "group", "role", "ploidy", "read1", "read2"}
 SAFE_NAME = re.compile(r"[A-Za-z0-9_.-]+")
 
+
+def figure_outputs(figdir, formats, stem):
+    return [f"{figdir}/{stem}.{fmt}" for fmt in formats]
+
+
+def build_figure_targets(figdir, formats, enabled, painting_ancestries, kmer_enabled, tables_enabled):
+    if not enabled:
+        return []
+    targets = []
+    if "parent_a" in painting_ancestries:
+        targets += figure_outputs(figdir, formats, "chromosome_painting")
+    if "parent_b" in painting_ancestries:
+        targets += figure_outputs(figdir, formats, "chromosome_painting_parentB")
+    targets += figure_outputs(figdir, formats, "window_ancestry")
+    targets += figure_outputs(figdir, formats, "dstat_calibration")
+    targets += figure_outputs(figdir, formats, "integer_dosage")
+    targets += figure_outputs(figdir, formats, "nquire_ploidy")
+    if kmer_enabled:
+        targets += figure_outputs(figdir, formats, "kmer_ancestry")
+    if tables_enabled:
+        targets.append(f"{figdir}/tables/manifest.tsv")
+    return targets
+
 def load_sample_sheet(path):
     with open(path, newline="") as handle:
         reader=csv.DictReader(handle,delimiter="\t")

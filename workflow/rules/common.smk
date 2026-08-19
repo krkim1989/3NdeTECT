@@ -4,7 +4,18 @@ from pathlib import Path
 from snakemake.utils import validate
 
 sys.path.insert(0, str(Path("workflow").resolve()))
-from lib import discover_contigs, load_sample_sheet, reference_assets, requested_contigs, validate_analysis_config, validate_contigs, validate_cox1_references, validate_sample_semantics
+from lib import (
+    build_figure_targets,
+    discover_contigs,
+    figure_outputs,
+    load_sample_sheet,
+    reference_assets,
+    requested_contigs,
+    validate_analysis_config,
+    validate_contigs,
+    validate_cox1_references,
+    validate_sample_semantics,
+)
 
 validate(config, "../../resources/schema/config.schema.yaml")
 validate_analysis_config(config)
@@ -79,35 +90,13 @@ FIGDIR = f"{RESULTS}/figures"
 PRIMARY_FAI = f"{PRIMARY_REF}.fai"
 
 
-def fig_outputs(stem):
-    return [f"{FIGDIR}/{stem}.{fmt}" for fmt in FIG_FORMATS]
-
-
-def fig_formats_arg():
-    return ",".join(FIG_FORMATS)
-
-
-def fig_base(wildcards, output):
-    return str(Path(output.figures[0]).with_suffix(""))
-
-
-def figure_targets(_):
-    if not FIGURES_ENABLED:
-        return []
-    targets = []
-    if "parent_a" in PAINT_ANCESTRIES:
-        targets += fig_outputs("chromosome_painting")
-    if "parent_b" in PAINT_ANCESTRIES:
-        targets += fig_outputs("chromosome_painting_parentB")
-    targets += fig_outputs("window_ancestry")
-    targets += fig_outputs("dstat_calibration")
-    targets += fig_outputs("integer_dosage")
-    targets += fig_outputs("nquire_ploidy")
-    if KMER_ENABLED:
-        targets += fig_outputs("kmer_ancestry")
-    if TABLES_ENABLED:
-        targets.append(f"{FIGDIR}/tables/manifest.tsv")
-    return targets
+# Keep Snakefile helpers as lambdas; implementation lives in workflow/lib.py.
+fig_outputs = lambda stem: figure_outputs(FIGDIR, FIG_FORMATS, stem)
+fig_formats_arg = lambda: ",".join(FIG_FORMATS)
+fig_base = lambda wildcards, output: str(Path(output.figures[0]).with_suffix(""))
+figure_targets = lambda _: build_figure_targets(
+    FIGDIR, FIG_FORMATS, FIGURES_ENABLED, PAINT_ANCESTRIES, KMER_ENABLED, TABLES_ENABLED
+)
 
 rule validate_inputs:
     input:
