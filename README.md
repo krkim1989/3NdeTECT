@@ -1,10 +1,10 @@
 # 3NdeTECT
 
-3NdeTECT is a taxon-agnostic Snakemake workflow for validating triploidy from
+3NdeTECT is an animal-focused Snakemake workflow for validating triploidy from
 whole-genome sequencing and estimating interspecific ancestry in triploid
-organisms. It was developed from *Crassostrea gigas*–*C. angulata* oyster
-analyses, but species names, parental groups, target groups, outgroups, and
-mitochondrial lineages are supplied by the user rather than hard-coded.
+animals. It was developed from *Crassostrea gigas*–*C. angulata* oyster
+analyses, but animal species names, parental groups, target groups, outgroups,
+and mitochondrial lineages are supplied by the user rather than hard-coded.
 
 The workflow answers two separate questions:
 
@@ -16,6 +16,25 @@ Ancestry evidence does not by itself prove a specific pedigree generation.
 3NdeTECT reports the genomic pattern and whether it is compatible with the
 configured simple-cross expectation; broodstock genotypes or an independently
 validated demographic model are needed to label an exact backcross generation.
+
+## Biological scope
+
+3NdeTECT is intended for animals (Kingdom Animalia). It is not presented as a
+general polyploid workflow for plants, fungi, or protists. Its default models
+assume:
+
+- a nuclear genome with biparental inheritance;
+- diploid representatives of both parental animal lineages;
+- triploid target animals with allele dosage states from zero to three copies;
+- sufficiently homologous parental genomes for joint variant analysis; and
+- an independently chosen animal outgroup for D-statistic orientation.
+
+The optional COX1 module is designed for animal mitochondrial lineage
+assignment. Disable it when COX1 does not resolve the relevant animal lineages,
+when homologous candidate references are unavailable, or when the study system
+has an atypical mitochondrial inheritance pattern. Clonal, hybridogenetic, or
+other non-Mendelian animal systems may also require modified pedigree and HMM
+assumptions even when the computational workflow runs successfully.
 
 ## Analysis modules
 
@@ -220,7 +239,33 @@ snakemake --configfile config/config.yaml --use-conda \
 | `hybrid_validation/hybrid_validation.tsv` | integrated evidence and conflict flags |
 | `cox1/cox1_summary.tsv` | maternal-lineage assignment, breadth, identity, margin |
 | `kmer/kmer_ancestry.tsv` | optional mapping-independent copy estimate |
-| `report/index.html` | human-readable summary report |
+| `figures/*.png` / `figures/*.tiff` | publication figures (PNG for the report, LZW TIFF for print) |
+| `figures/source_data/*.tsv` | the exact numbers behind each figure |
+| `figures/tables/*.tsv` | curated result tables (one per topic) with a `manifest.tsv` |
+| `report/index.html` | human-readable summary report, with the PNG figures embedded |
+
+### Figures and tables
+
+`report.figures` (config) renders the analysis outputs into figures and curated
+tables. Everything is driven by the run's own data and config — chromosome
+count, ploidy states, sample names, and the ancestry legend label
+(`ancestry_label`, defaulting to `parent_a_group`) — so the same rules serve any
+cross, not a fixed study. Generated figures:
+
+| figure | source table |
+|---|---|
+| `chromosome_painting` | `ancestry/local_ancestry_segments.tsv` (per-chromosome parent_a copy-number tracts) |
+| `chromosome_painting_parentB` | same segments painted as parent_b copies (`ploidy - parent_a`); enable with `painting_ancestries: [parent_a, parent_b]` |
+| `window_ancestry` | `ancestry/window_ancestry.tsv` (calibrated copies in genome order) |
+| `integer_dosage` | `hybrid_validation/dosage_states.tsv` (per-target state composition) |
+| `dstat_calibration` | `dstat/synthetic_calibration.tsv` + `dstat/dstat.tsv` |
+| `nquire_ploidy` | `ploidy/ploidy_summary.tsv` (allele-spectrum ratio vs threshold) |
+| `kmer_ancestry` | `kmer/kmer_ancestry.tsv` (only when k-mer analysis is enabled) |
+
+Configure output formats and resolution with `report.figures.formats`
+(e.g. `[png, tiff]`) and `report.figures.dpi`; set `report.figures.enabled:
+false` to skip the whole module, or `report.figures.tables: false` for figures
+only.
 
 Key interpretation rules:
 

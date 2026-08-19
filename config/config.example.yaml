@@ -97,3 +97,15 @@ resources:
 
 report:
   title: "Triploidy and hybrid ancestry report"
+  figures:
+    enabled: true
+    formats: [png, tiff]   # png for the HTML report, tiff (LZW) for publication
+    dpi:
+      png: 150
+      tiff: 300
+    tables: true           # also emit curated result tables under results/figures/tables
+    # paint chromosomes from each species' copy-number perspective; parent_b
+    # copies = ploidy - parent_a copies. Use [parent_a, parent_b] for both.
+    painting_ancestries: [parent_a, parent_b]
+    # ancestry_label: null            # parent_a legend name; defaults to parent_a_group
+    # reciprocal_ancestry_label: null # parent_b legend name; defaults to parent_b_group

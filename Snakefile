@@ -5,11 +5,13 @@ include: "workflow/rules/mapping.smk"
 include: "workflow/rules/ploidy.smk"
 include: "workflow/rules/mitochondrial.smk"
 include: "workflow/rules/ancestry.smk"
+include: "workflow/rules/figures.smk"
 include: "workflow/rules/report.smk"
 
 rule all:
     input:
         rules.report.output.html,
+        (rules.figures.output.done if FIGURES_ENABLED else []),
         rules.ploidy_summary.output.summary,
         expand(f"{RESULTS}/ancestry/{{panel}}/dosage_summary.tsv", panel=PANELS),
         (rules.reciprocal_concordance.output.tsv if RECIP_REF_KEY else []),
