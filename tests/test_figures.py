@@ -90,3 +90,41 @@ def test_parent_b_painting_uses_complement_copy_number(tmp_path):
     assert base.with_suffix(".png").is_file()
     out = pd.read_csv(src, sep="\t")
     assert int(out.PAINT_COPY.iloc[0]) == 2
+
+
+def _run_painting(tmp_path, seg, fai_text, extra=()):
+    seg_path = tmp_path / "segments.tsv"
+    seg.to_csv(seg_path, sep="\t", index=False)
+    fai = tmp_path / "ref.fa.fai"
+    fai.write_text(fai_text)
+    base = tmp_path / "painting"
+    src = tmp_path / "source.tsv"
+    return subprocess.run([
+        sys.executable, str(SCRIPTS / "plot_chromosome_painting.py"),
+        "--segments", str(seg_path), "--fai", str(fai),
+        "--output-base", str(base), "--source-data", str(src), "--formats", "png", *extra,
+    ], cwd=ROOT, check=True, capture_output=True, text=True)
+
+
+def test_contig_name_mismatch_warns(tmp_path):
+    # a segment chromosome absent from the .fai must trigger a stderr warning
+    seg = pd.DataFrame([
+        dict(sample="S1", model="constrained", CHROM="scaffold_x", start=0, end=500000,
+             bp_length=500000, ploidy=3, A_COPY=0, n_sites=5, mean_A_read_fraction=0.0,
+             pass_filter=True),
+    ])
+    r = _run_painting(tmp_path, seg, "chr1\t10000000\t0\t60\t61\n")
+    assert "not found in the .fai" in r.stderr
+
+
+def test_all_fai_chromosomes_includes_markerless_contigs(tmp_path):
+    # chr2 has no segments but must still be painted in --all-fai-chromosomes mode
+    seg = pd.DataFrame([
+        dict(sample="S1", model="constrained", CHROM="chr1", start=0, end=3000000,
+             bp_length=3000000, ploidy=3, A_COPY=1, n_sites=10, mean_A_read_fraction=0.33,
+             pass_filter=True),
+    ])
+    fai = "chr1\t10000000\t0\t60\t61\nchr2\t8000000\t10000000\t60\t61\n"
+    r = _run_painting(tmp_path, seg, fai, extra=["--all-fai-chromosomes"])
+    assert (tmp_path / "painting.png").is_file()
+    assert r.returncode == 0

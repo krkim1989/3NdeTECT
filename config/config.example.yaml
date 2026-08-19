@@ -107,5 +107,8 @@ report:
     # paint chromosomes from each species' copy-number perspective; parent_b
     # copies = ploidy - parent_a copies. Use [parent_a, parent_b] for both.
     painting_ancestries: [parent_a, parent_b]
+    # draw every reference chromosome at full length (including markerless ones)
+    # instead of only chromosomes that carry diagnostic segments
+    all_fai_chromosomes: false
     # ancestry_label: null            # parent_a legend name; defaults to parent_a_group
     # reciprocal_ancestry_label: null # parent_b legend name; defaults to parent_b_group

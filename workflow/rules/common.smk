@@ -84,6 +84,9 @@ FIG_DPI_TIFF = FIG_DPI.get("tiff", 300)
 ANCESTRY_LABEL = FIG_CFG.get("ancestry_label", config["analysis"]["parent_a_group"])
 ANCESTRY_LABEL_B = FIG_CFG.get("reciprocal_ancestry_label", config["analysis"]["parent_b_group"])
 PAINT_ANCESTRIES = FIG_CFG.get("painting_ancestries", ["parent_a"])
+# Draw every reference chromosome at full length (even markerless ones) instead
+# of only those that carry diagnostic segments.
+PAINT_ALL_FAI_FLAG = "--all-fai-chromosomes" if FIG_CFG.get("all_fai_chromosomes", False) else ""
 TABLES_ENABLED = FIG_CFG.get("tables", True)
 KMER_ENABLED = config["analysis"]["kmer"].get("enabled", False)
 FIGDIR = f"{RESULTS}/figures"

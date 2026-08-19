@@ -267,6 +267,15 @@ Configure output formats and resolution with `report.figures.formats`
 false` to skip the whole module, or `report.figures.tables: false` for figures
 only.
 
+Chromosome-painting tracks are always drawn to the true physical chromosome
+length from the reference `.fai`, so a chromosome whose diagnostic markers stop
+early is still shown full length (grey past the last marker). By default only
+chromosomes that carry diagnostic segments are drawn; set
+`report.figures.all_fai_chromosomes: true` to draw every reference chromosome at
+full length, including markerless ones. A segment contig missing from the `.fai`
+(name mismatch with the mapping reference) is warned about rather than silently
+truncated.
+
 Key interpretation rules:
 
 - `triploid_supported` requires informative allele-balance spectra relative to

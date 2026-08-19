@@ -8,10 +8,18 @@ its true length from the reference .fai, with a grey background for stretches
 that carry no diagnostic markers and coloured tracts where the HMM assigned an
 integer parent_a copy number.
 
+Track length is always the true physical chromosome length from the reference
+.fai, so a chromosome whose diagnostic markers stop early is still drawn to its
+full length. Contig names that appear in the segments but not in the .fai are
+warned about (they would otherwise be truncated to the last marker). With
+``--all-fai-chromosomes`` every reference chromosome is drawn at full length,
+including those without any diagnostic markers.
+
 Fully generic: the number of chromosomes, samples, and ploidy states are taken
 from the data, and the ancestry name shown in the legend comes from the config.
 """
 import argparse
+import sys
 from pathlib import Path
 
 import pandas as pd
@@ -43,6 +51,9 @@ def main():
     p.add_argument("--focal-copy", choices=["parent_a", "parent_b"], default="parent_a",
                    help="which parent's copy number to paint; parent_b uses ploidy - A_COPY")
     p.add_argument("--model", default="constrained", help="HMM model column to paint")
+    p.add_argument("--all-fai-chromosomes", action="store_true",
+                   help="draw every chromosome in the .fai at full length (including those "
+                        "without diagnostic markers), not only the ones present in the segments")
     p.add_argument("--output-base", required=True, help="output path without extension")
     p.add_argument("--source-data", required=True)
     p.add_argument("--formats", default="png,tiff")
@@ -68,13 +79,36 @@ def main():
 
     fai_lengths = read_fai_lengths(a.fai)
     samples = sorted(seg["sample"].unique(), key=natural_key)
-    chroms = ordered_chromosomes(seg.CHROM.unique(), fai_lengths)
-    chrom_index = {c: i for i, c in enumerate(chroms)}
-    max_copy = int(seg.PAINT_COPY.max())
-
-    # length fallback: if a contig is missing from the .fai, use the furthest
-    # segment end so the track is still drawn to a sensible extent.
+    seg_chroms = set(seg.CHROM.unique())
     seg_max_end = seg.groupby("CHROM").end.max().to_dict()
+
+    # Warn loudly on contig-name mismatch: a segment chromosome absent from the
+    # .fai means the reference and the segments disagree on names, and its track
+    # would otherwise be silently truncated to the last diagnostic marker.
+    missing = sorted(c for c in seg_chroms if c not in fai_lengths)
+    if missing:
+        print(f"WARNING: {len(missing)} segment chromosome(s) not found in the .fai "
+              f"(name mismatch?): {', '.join(missing[:10])}"
+              f"{' ...' if len(missing) > 10 else ''}. Their tracks fall back to the last "
+              f"diagnostic-marker coordinate, so they may look shorter than the true "
+              f"chromosome. Check that --fai matches the mapping reference.", file=sys.stderr)
+
+    if a.all_fai_chromosomes:
+        # Every reference chromosome at true length, even without markers.
+        chroms = sorted(fai_lengths, key=natural_key)
+        dropped = sorted(c for c in seg_chroms if c not in fai_lengths)
+        if dropped:
+            print(f"WARNING: {len(dropped)} segment chromosome(s) are not in the .fai and are "
+                  f"omitted in --all-fai-chromosomes mode: {', '.join(dropped[:10])}"
+                  f"{' ...' if len(dropped) > 10 else ''}", file=sys.stderr)
+        seg = seg[seg.CHROM.isin(fai_lengths)]
+    else:
+        chroms = ordered_chromosomes(seg_chroms, fai_lengths)
+    chrom_index = {c: i for i, c in enumerate(chroms)}
+    max_copy = int(seg.PAINT_COPY.max()) if not seg.empty else 0
+
+    # Track length is the true physical length from the .fai; only contigs absent
+    # from the .fai (mismatch, warned above) fall back to the last segment end.
     lengths = {c: fai_lengths.get(c, seg_max_end.get(c, 1)) for c in chroms}
     genome_max_mb = max(lengths.values()) / 1e6
 

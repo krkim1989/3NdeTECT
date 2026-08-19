@@ -19,10 +19,11 @@ rule figure_chromosome_painting:
     params:
         base=fig_base,
         fmts=fig_formats_arg(),
-        label=ANCESTRY_LABEL
+        label=ANCESTRY_LABEL,
+        allfai=PAINT_ALL_FAI_FLAG
     shell:
         "python workflow/scripts/plot_chromosome_painting.py --segments {input.segments:q} "
-        "--fai {input.fai:q} --ancestry-label {params.label:q} --focal-copy parent_a "
+        "--fai {input.fai:q} --ancestry-label {params.label:q} --focal-copy parent_a {params.allfai} "
         "--output-base {params.base:q} --source-data {output.source:q} --formats {params.fmts:q} "
         f"--dpi-png {FIG_DPI_PNG} --dpi-tiff {FIG_DPI_TIFF} > {{log:q}} 2>&1"
 
@@ -41,10 +42,11 @@ rule figure_chromosome_painting_parent_b:
     params:
         base=fig_base,
         fmts=fig_formats_arg(),
-        label=ANCESTRY_LABEL_B
+        label=ANCESTRY_LABEL_B,
+        allfai=PAINT_ALL_FAI_FLAG
     shell:
         "python workflow/scripts/plot_chromosome_painting.py --segments {input.segments:q} "
-        "--fai {input.fai:q} --ancestry-label {params.label:q} --focal-copy parent_b "
+        "--fai {input.fai:q} --ancestry-label {params.label:q} --focal-copy parent_b {params.allfai} "
         "--output-base {params.base:q} --source-data {output.source:q} --formats {params.fmts:q} "
         f"--dpi-png {FIG_DPI_PNG} --dpi-tiff {FIG_DPI_TIFF} > {{log:q}} 2>&1"
 

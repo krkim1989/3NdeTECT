@@ -185,3 +185,4 @@ properties:
             minItems: 1
             uniqueItems: true
             items: {type: string, enum: [parent_a, parent_b]}
+          all_fai_chromosomes: {type: boolean}
