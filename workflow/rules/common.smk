@@ -25,7 +25,7 @@ RESULTS = config.get("results", "results")
 PRIMARY_REF_KEY = config["analysis"]["primary_reference"]
 PRIMARY_REF = config["references"][PRIMARY_REF_KEY]
 RECIP_REF_KEY = config["analysis"].get("reciprocal_reference")
-PANELS = ["primary"] + (["reciprocal"] if RECIP_REF_KEY else [])
+PANELS = ["primary", "reciprocal"] if RECIP_REF_KEY else ["primary"]
 PLOIDY_PANEL = config["analysis"].get("ploidy", {}).get("reference_panel", "primary")
 if PLOIDY_PANEL not in PANELS:
     raise ValueError(f"ploidy.reference_panel must be one of {PANELS}: {PLOIDY_PANEL}")
@@ -109,7 +109,7 @@ rule validate_inputs:
         f"{RESULTS}/logs/validate_inputs.log"
     params:
         refs=" ".join(
-            f"--reference {shlex.quote(key + '=' + value)}"
+            f"--reference {shlex.quote('='.join((key, value)))}"
             for key, value in config["references"].items()
         )
     conda:
