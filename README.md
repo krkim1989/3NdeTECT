@@ -284,6 +284,60 @@ Key interpretation rules:
 - Agreement among dosage, D, k-mer, reciprocal mapping, and tract structure is
   stronger than any single method.
 
+#### How to read the result tables
+
+Read the tables in this order: `ploidy_summary.tsv` (is the target consistent
+with three chromosome copies?), `dosage_states.tsv` (what integer parental-copy
+state is observed?), and `hybrid_validation.tsv` (do the independent methods
+agree?). The table below gives the fields that are most often used in a report.
+
+| table/field | meaning | cautious interpretation |
+|---|---|---|
+| `ploidy_call` | nQuire/spectrum call relative to diploid controls | `triploid_supported` supports three-copy data; `insufficient_data` is unresolved, not diploid |
+| `parent_a_copy_dosage` | calibrated genome-wide parent-A copy estimate | use only when diagnostic-SNP QC and reciprocal mapping pass |
+| `parent_a_copy_dstat_calibrated` | D-statistic copy estimate from synthetic calibration | calibration is dataset/outgroup-specific; it is not a universal copy unit |
+| `parent_a_copy_kmer` | mapping-independent k-mer estimate | agreement with SNP dosage is supportive; disagreement flags bias or contamination |
+| `forbidden_opposite_parent_fraction` | fraction of sites inconsistent with the configured maternal/parental state | a high value is a conflict/QC signal, not proof of a particular pedigree |
+| `simple_cross_compatible` | whether the observed copy estimate is within the configured simple-cross tolerance | `False` rejects that dosage expectation; it does not identify a unique backcross generation |
+| `cox1_lineage` / `cox1_status` | mitochondrial lineage and assignment quality | COX1 is maternal-lineage evidence, not a nuclear ancestry estimate |
+| `significant_outgroups` / `dstat_support` | independent outgroup D-statistic support | require the configured minimum number of informative outgroups and blocks |
+
+For `dstat.tsv`, inspect `D`, its jackknife standard error or confidence
+interval, the multiple-testing-adjusted value (`q_value`/FDR), and the number of
+informative blocks together. A large absolute D with few blocks is unstable.
+For `window_ancestry_summary.tsv` and `local_ancestry_segments.tsv`, compare
+the number of callable sites (`n_sites`) and segment length before comparing
+ancestry fractions. Short, low-information windows should not be treated as
+biological transitions.
+
+#### How to read the figures
+
+- **Chromosome painting:** each horizontal track is a chromosome in reference
+  order; colour is the integer number of copies assigned to the focal parent.
+  Grey means no diagnostic markers, not zero ancestry. The parent-B version
+  paints `ploidy - parent-A copies` and is a perspective change, not a second
+  independent call.
+- **Window ancestry:** points/segments show calibrated ancestry copy or
+  fraction along the genome. Broad, reproducible shifts are informative;
+  isolated spikes often reflect low site count or mapping bias.
+- **Integer dosage:** each sample is placed among discrete 0..ploidy parental
+  copy states. Separation from diploid controls supports triploid dosage, while
+  broad/overlapping distributions indicate uncertainty.
+- **D-statistic calibration:** the curve converts D into an estimated copy
+  number for this dataset. Only the monotonic in-range portion is interpretable;
+  extrapolated values (`below_range`/`above_range`) must remain flagged.
+- **nQuire ploidy:** the target spectrum is compared with matched diploid and
+  triploid-like expectations. Use the reported call and QC thresholds rather
+  than judging the curve by visual height alone.
+- **k-mer ancestry:** k-mer proportions provide a mapping-independent check.
+  Similarity to SNP-based dosage is supportive; a systematic difference calls
+  for checking repeats, coverage, and reference bias.
+
+The PNG files are for the HTML report and quick inspection; TIFF files are for
+publication. Always cite the matching `figures/source_data/*.tsv` file when a
+figure value is reported, and retain the configuration snapshot and software
+versions with the figure.
+
 ## Troubleshooting and recovery
 
 Start with the failed rule name and its log:
